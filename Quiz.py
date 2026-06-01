@@ -49,7 +49,7 @@ try:
         for j in range(1, 5):
             print(q[j])
         
-        answer = input("Enter your answer (A/B/C/D): ").upper()
+        answer = str(input("Enter your answer (A/B/C/D): ").upper())
         
         if answer == q[5]:
             print("Correct!")
@@ -58,7 +58,7 @@ try:
             print("Wrong! The correct answer was {}".format(q[5]))
 
 except TypeError:
-    print("A TypeError occurred. Please check your data.")
+    print("Please enter one of the options")
 
 print()
 print("Your final score is {}/{}".format(score, len(questions)))

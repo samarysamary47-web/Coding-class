@@ -1,0 +1,6 @@
+Werd,Wurd,Woord,Word,4
+Helo,Hello,Haloo,Hellou,2
+Super,Sooper,Souper,Supar,1
+Wonda,Wonde,Wunder,Wonder,4
+Pithon,Piethon,Python,Pyton,3
+Playground,Playgrownd,Playgound,Payground,1

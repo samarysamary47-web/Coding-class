@@ -15,15 +15,15 @@ flower.pos = random.randint(50,450),random.randint(50,450)
 time = 25
 
 def draw():
+    screen.blit("bg",(0,0))
     global message,time
     message = "Your score was {}".format(score)
     if not has_ended:
-        screen.fill("lightblue")
         bee.draw()
         flower.draw()
         screen.draw.text("Time left:{}".format(time),center = (WIDTH/2,HEIGHT/8))
     else:
-        screen.fill("lightblue")
+        screen.blit("bg",(0,0))
         screen.draw.text(message,center = (WIDTH/2,HEIGHT/2))
 
 def update():

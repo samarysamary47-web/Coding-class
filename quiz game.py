@@ -94,6 +94,7 @@ def second():
 
 def on_mouse_down(pos):
     global timer,question
+    
     index = 1
 
     for i in answer_boxes:

@@ -1,4 +1,5 @@
 import pgzrun
+
 WIDTH = 400
 HEIGHT = 400
 
@@ -9,9 +10,7 @@ def draw():
     g = 50
     b = 100
     for i in range(10):
-        rect = Rect((100,150),(w * (i*0.1),h * (i*0.1)))
-        rect.center = WIDTH/2,HEIGHT/2
-        screen.draw.rect(rect,(r,g,b))
+        screen.draw.circle((WIDTH/2, HEIGHT/2), 50 * ((i + 1) / 5), (r, g, b))
         r += 10
         g += 10
         b += 10

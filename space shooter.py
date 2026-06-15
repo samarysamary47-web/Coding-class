@@ -1,12 +1,12 @@
-import pgzrun
+import pgzrun,time
 
 WIDTH = 750
 HEIGHT = 500
 TITLE = "Space Shooter"
 
 turn = "left"
-cooldown = False
 win = False
+game_over = False
 
 player = Actor("spaceship")
 player.pos = WIDTH // 2, HEIGHT - 50
@@ -14,65 +14,91 @@ player.pos = WIDTH // 2, HEIGHT - 50
 bullets = []
 
 enemies = []
-for row in range(1):
-    for column in range(1):
+for row in range(5):
+    for column in range(5):
         enemy = Actor("enemy_spaceship")
-        enemy.pos = row * 50 + 250,column * 35 + 20
+        enemy.pos = row * 50 + 250, column * 35 + 20
         enemies.append(enemy)
+
+last_shot = 0
+SHOT_DELAY = 0.4
 
 def draw():
     screen.fill("lightblue")
 
-    if not win:
-        player.draw()
+    if win:
+        screen.draw.text(
+            "Well done. You won!",
+            center = (WIDTH // 2, HEIGHT // 2),
+            fontsize = 40,
+            color = "green"
+        )
+        return
 
-        for i in enemies:
-            i.draw()
+    if game_over:
+        screen.draw.text(
+            "Game Over!",
+            center = (WIDTH // 2, HEIGHT // 2),
+            fontsize = 40,
+            color = "red"
+        )
+        return
 
-        for i in bullets:
-            i.draw()
-            i.y -= 1
-    else:
-        screen.draw.text("Well done. You won!",0,0,fontsize = 40,
-                         color = "black",
-                         center = (WIDTH // 2,HEIGHT // 2))
+    player.draw()
+
+    for i in enemies:
+        i.draw()
+
+    for i in bullets:
+        i.draw()
 
 def shoot():
-    global cooldown,bullets
+    global last_shot
 
-    if not cooldown:
+    now = time.time()
+
+    if now - last_shot >= SHOT_DELAY:
         bullet = Actor("bullet")
         bullet.pos = player.pos
         bullets.append(bullet)
+        last_shot = now
 
 def update():
-    global win
+    global win, game_over
+
+    if win or game_over:
+        return
 
     if keyboard.a:
         player.x -= 10
     if keyboard.d:
         player.x += 10
-    for i in enemies:
-        for j in bullets:
+
+    for i in bullets[:]:
+        i.y -= 6
+
+        if i.y <= 0:
+            bullets.remove(i)
+
+    for i in enemies[:]:
+        for j in bullets[:]:
             if i.collidepoint(j.pos):
                 enemies.remove(i)
                 bullets.remove(j)
-            if j.y <= 0:
-                bullets.remove(j)
+                break
+
+    for i in enemies:
+        if i.y >= HEIGHT - 80:
+            game_over = True
+
     if not enemies:
         win = True
 
-def on_key_up(key):
-    global cooldown
-
+def on_key_down(key):
     if key == keys.SPACE:
         shoot()
-        cooldown = True
-
-        cooldown = False
 
 def move_down():
-    global turn
     for i in enemies:
         i.y += 25
 
@@ -93,8 +119,8 @@ def switch():
     else:
         turn = "left"
 
-clock.schedule_interval(move_down,3)
-clock.schedule_interval(move_sideways,1)
-clock.schedule_interval(switch,5)
+clock.schedule_interval(move_down, 3)
+clock.schedule_interval(move_sideways, 1)
+clock.schedule_interval(switch, 5)
 
 pgzrun.go()

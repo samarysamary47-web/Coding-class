@@ -1,8 +1,11 @@
-import pygame,os
+import pygame,random
 from pygame.locals import *
 
 width = 1000
 height = 750
+
+pipe_frequency = 2500
+last_pipe = pygame.time.get_ticks() - pipe_frequency
 
 ground_movement = 0
 scroll_speed = 1
@@ -78,21 +81,40 @@ ground = pygame.image.load("C:\\Users\\nkema\\OneDrive\\Desktop\\Jetlearn\\Pro G
 ground = pygame.transform.scale(ground,(width + 75,100))
 
 class Pipe(pygame.sprite.Sprite):
+
     def __init__(self,x,y,pos):
         pygame.sprite.Sprite.__init__(self)
-        self.img = "C:\\Users\\nkema\\OneDrive\\Desktop\\Jetlearn\\Pro Game Dev\\Flappy Bird Images\\pipe(1).png"
-        self.rect = self.img.get_rect()
-        if pos == 1:
-            self.img = pygame.transform.flip(self.img,False,True)
-            self.rect.bottom_left = (x,y)
-        elif pos == -1:
-            self.rect.top_left = (x,y)
+        self.image = pygame.image.load("C:\\Users\\nkema\\OneDrive\\Desktop\\Jetlearn\\Pro Game Dev\\Flappy Bird Images\\pipe.png")
+        self.rect = self.image.get_rect()
+        self.x = x
+        self.y = y
 
-Pipe_group = pygame.sprite.Group(0,0,1)
+        if pos == 1:
+            self.image = pygame.transform.flip(self.image,False,True)
+            self.rect.bottomleft = (self.x,self.y - (150 // 2))
+        elif pos == -1:
+            self.rect.topleft = (self.x,self.y + (150 // 2))
+
+    def update(self):
+        self.rect.x -= scroll_speed
+        if self.rect.right < 0:
+            self.kill()
+
+class restart():
+    def __init__(self,x,y,img):
+        self.x = x
+        self.y = y
+        self.img = img
+
+        self.rect = self.img.get_rect()
+        self.rect.topleft = (self.x,self.y)
+
+Pipe_group = pygame.sprite.Group()
 
 while 1:
 
     screen.blit(background,(0,0))
+    Pipe_group.draw(screen)
     bird_group.draw(screen)
     bird_group.update()
 
@@ -100,6 +122,26 @@ while 1:
     ground_movement -= scroll_speed
     if ground_movement < -75:
         ground_movement = 0
+
+    if flying and not game_over:
+        time_now = pygame.time.get_ticks()
+        if time_now - last_pipe > pipe_frequency:
+            pipe_height = random.randint(-50,50)
+            bottom_pipe = Pipe(width,pipe_height + height // 2,-1)
+            top_pipe = Pipe(width,pipe_height + height // 2,1)
+            Pipe_group.add(bottom_pipe)
+            Pipe_group.add(top_pipe)
+            last_pipe = time_now
+
+    Pipe_group.update()
+
+    if pygame.sprite.groupcollide(
+        Pipe_group,bird_group,False,False) or flappy_bird.rect.top < 0:
+        game_over = True
+        flying = False
+    if flappy_bird.rect.bottom >= height - 75:
+        game_over = True
+        flying = False
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
